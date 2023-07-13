@@ -214,8 +214,15 @@ app.post("/vaccination-done", async (request, response) =>
         {
             await pgPool.query("delete from vaccination\
                                 where user_id = $1\
-                                and vaccine_id = $2 and vaccination_date = $3", [request.body.user_id, request.body.vaccine_id, request.body.vaccine_date])
-            await pgPool.query("update users set unseen_count = unseen_count + 1 where id = $1", [request.body.user_id])
+                                and vaccine_id = $2
+                                [
+                                    request.body.user_id,
+                                    request.body.vaccine_id
+                                ])
+            await pgPool.query("update users\
+                                set unseen_count = unseen_count + 1\
+                                where id = $1",
+                                [request.body.user_id])
 
             response.send(
             {
