@@ -175,7 +175,7 @@ app.post("/get-user-id", async (request, response) =>
 
 app.post("/vaccine-taker", async (request, response) =>
 {
-    let result = await pgPool.query("select vaccination_date, vaccine_name\
+    let result = await pgPool.query("select vaccine.vaccine_id as v_id, vaccination_date, vaccine_name\
                                 from vaccination\
                                 join vaccine\
                                 on vaccination.vaccine_id = vaccine.vaccine_id\
@@ -185,90 +185,8 @@ app.post("/vaccine-taker", async (request, response) =>
 
     for(let i = 0; i < result.rowCount; ++i)
     {
-        vaccineList.push({date: result.rows[i].vaccination_date, vaccine_name: result.rows[i].vaccine_name})
+        vaccineList.push({vaccine_id: result.rows[i].v_id, date:result.rows[i].vaccination_date, vaccine_name: result.rows[i].vaccine_name})
     }
-
-    response.send(
-    {
-        error_code: 0,
-        list: vaccineList
-    })
-})
-
-app.post("/vaccination-done", async (request, response) =>
-{
-    let result = await pgPool.query("select * from vaccination where user_id = $1 and vaccine_id = $2 and vaccination_date = $3", [request.body.user_id, request.body.vaccine_id, request.body.vaccine_date])
-
-    if(result.rowCount > 0)
-    {
-        await pgPool.query("insert into vaccination_message\
-                            (user_id, vaccine_id, vaccination_date)\
-                            values($1, $2, $3)",
-                            [
-                                request.body.user_id,
-                                request.body.vaccine_id,
-                                request.body.vaccine_date
-                            ])
-        await pgPool.query("delete from vaccination\
-                            where user_id = $1\
-                            and vaccine_id = $2 and vaccination_date = $3", [request.body.user_id, request.body.vaccine_id, request.body.vaccine_date])
-        await pgPool.query("update users set unseen_count = unseen_count + 1 where id = $1", [request.body.user_id])
-
-        response.send(
-        {
-            error_code: 0
-        })
-    }
-    else
-    {
-        response.send(
-        {
-            error_code: -1
-        })
-    }
-})
-
-app.post("/message-seen", async (request, response) =>
-{
-    await pgPool.query("update users\
-                        set unseen_count = 0\
-                        where id = $1", [request.body.user_id])
-
-    response.send(
-    {
-        error_code: 0
-    })
-})
-
-app.post("/get-user-id", async (request, response) =>
-{
-    let result = await pgPool.query("select id\
-                                from users\
-                                where name = $1", [request.body.name])
-
-    response.send(
-    {
-        error_code: 0,
-        id: result.rows[0].id
-    })
-})
-
-app.post("/vaccine-taker", async (request, response) =>
-{
-    let result = await pgPool.query("select vaccine.vaccine_id as vid,vaccination_date, vaccine_name\
-                                from vaccination\
-                                join vaccine\
-                                on vaccination.vaccine_id = vaccine.vaccine_id\
-                                where user_id = $1", [request.body.user_id])
-
-    let vaccineList = []
-
-    for(let i = 0; i < result.rowCount; ++i)
-    {
-        vaccineList.push({vaccine_id:result.rows[i].vid,date:result.rows[i].date, vaccine_name: result.rows[i].vaccine_name})
-    }
-
-    console.log(vaccineList)
 
     response.send(
     {
