@@ -327,7 +327,7 @@ app.post("/message-seen", async (request, response) =>
     })
 })
 
-const server = app.listen(process.env.PORT, () =>
+const server = app.listen(process.env.PORT || port, () =>
 {
     console.log("Server listening on port " + port)
 })
