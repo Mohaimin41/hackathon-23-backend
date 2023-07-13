@@ -258,6 +258,16 @@ app.post("/message-seen", async (request, response) =>
     })
 })
 
+app.post("/message-unseen", async (request, response) =>
+{
+    let result = await pgPool.query("select unseen_count from users where id = $1", [request.body.user_id])
+
+    response.send(
+    {
+        error_code: 0,
+        unseen_count: result.rows[0].unseen_count
+    })
+})
 
 const server = app.listen(process.env.PORT || port, () =>
 {
