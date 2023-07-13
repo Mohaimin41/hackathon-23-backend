@@ -41,14 +41,7 @@ app.post('/sign-up', async (request, response) =>
 
     try
     {
-        if(request.body.type == 0)
-        {
-            await pgPool.query("insert into " + databaseSuffix + " (name, address, n_id, password_hash) values ($1, $2, $3, $4)", [request.body.name, request.body.address, request.body.n_id, request.body.password_hash])
-        }
-        else
-        {
-            await pgPool.query("insert into " + databaseSuffix + " (name, password_hash) values ($1, $2)", [request.body.name, request.body.password_hash])
-        }
+        await pgPool.query("insert into " + databaseSuffix + " (name, address, n_id, password_hash) values ($1, $2, $3, $4)", [request.body.name, request.body.address, request.body.n_id, request.body.password_hash])
 
         response.send(
         {
