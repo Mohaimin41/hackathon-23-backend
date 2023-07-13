@@ -185,7 +185,7 @@ app.post("/vaccine-taker", async (request, response) =>
 
     for(let i = 0; i < result.rowCount; ++i)
     {
-        vaccineList.push({date: result.rows[i].date, vaccine_name: result.rows[i].vaccine_name})
+        vaccineList.push({date: result.rows[i].vaccination_date, vaccine_name: result.rows[i].vaccine_name})
     }
 
     response.send(
@@ -255,7 +255,7 @@ app.post("/get-user-id", async (request, response) =>
 
 app.post("/vaccine-taker", async (request, response) =>
 {
-    let result = await pgPool.query("select vaccination_date, vaccine_name\
+    let result = await pgPool.query("select vaccine.vaccine_id as vid,vaccination_date, vaccine_name\
                                 from vaccination\
                                 join vaccine\
                                 on vaccination.vaccine_id = vaccine.vaccine_id\
@@ -265,8 +265,10 @@ app.post("/vaccine-taker", async (request, response) =>
 
     for(let i = 0; i < result.rowCount; ++i)
     {
-        vaccineList.push({date: result.rows[i].date, vaccine_name: result.rows[i].vaccine_name})
+        vaccineList.push({vaccine_id:result.rows[i].vid,date:result.rows[i].date, vaccine_name: result.rows[i].vaccine_name})
     }
+
+    console.log(vaccineList)
 
     response.send(
     {
