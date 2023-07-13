@@ -101,9 +101,11 @@ app.post("/login", async (request, response) =>
         }
     }
 
+    const cookieString=request.body.name + Date.now()
+
     if(loginCredsOk)
     {
-        const cookieString = "id=" + result.rows[0].id + "; date=" + Date.now() + "; type=" + request.body.type
+        // const cookieString = "id=" + result.rows[0].id + "; date=" + Date.now() + "; type=" + request.body.type
 
         await pgPool.query("insert into logged_in_" + databaseSuffix + " (cookie_string, user_id) values ($1, $2)", [cookieString, result.rows[0].id])
         response.setHeader("Set-Cookie", cookieString)
@@ -114,7 +116,7 @@ app.post("/login", async (request, response) =>
     {
         type: request.body.type,
         error_code: errorCode,
-        name: request.body.name + Date.now()
+        name: cookieString
     })
 })
 
