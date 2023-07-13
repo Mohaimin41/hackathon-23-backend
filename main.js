@@ -106,34 +106,36 @@ app.post("/login", async (request, response) =>
         const cookieString = "id=" + result.rows[0].id + "; date=" + Date.now() + "; type=" + request.body.type
 
         await pgPool.query("insert into logged_in_" + databaseSuffix + " (cookie_string, user_id) values ($1, $2)", [cookieString, result.rows[0].id])
-        response.appendHeader("Set-Cookie", cookieString)        
+        response.setHeader("Set-Cookie", cookieString)
+        response.cookie("id", result.rows[0].id)
     }
     
     response.send(
     {
         type: request.body.type,
-        error_code: errorCode
+        error_code: errorCode,
+        name: request.body.name + Date.now()
     })
 })
 
 app.post("/vaccine-registration", async (request, response) =>
 {
-    const cookieString = request.header("Cookie")
-    const cookieList = cookieString.split("; ")
-    let cookiePairs = new Map()
+    // const cookieString = request.header("Cookie")
+    // const cookieList = cookieString.split("; ")
+    // let cookiePairs = new Map()
 
-    for(let i = 0; i < cookieList.length; ++i)
-    {
-        let splitTokens = cookieList[i].split("=") 
+    // for(let i = 0; i < cookieList.length; ++i)
+    // {
+    //     let splitTokens = cookieList[i].split("=") 
 
-        cookiePairs.set(splitTokens[0], splitTokens[1])
-    }
+    //     cookiePairs.set(splitTokens[0], splitTokens[1])
+    // }
 
     let result = null
 
-    if(cookiePairs.get("type") == "0")
+    if(request.body.type == "0")
     {
-        result = await pgPool.query("select user_id from logged_in_users where cookie_string = $1", [cookieString])
+        result = await pgPool.query("select user_id from logged_in_users where cookie_string = $1", [request.body.name])
     }
     else
     {
