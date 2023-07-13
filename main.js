@@ -209,15 +209,26 @@ app.post("/vaccination-done", async (request, response) =>
                                 request.body.vaccine_id,
                                 request.body.vaccine_date
                             ])
-        await pgPool.query("delete from vaccination\
-                            where user_id = $1\
-                            and vaccine_id = $2 and vaccination_date = $3", [request.body.user_id, request.body.vaccine_id, request.body.vaccine_date])
-        await pgPool.query("update users set unseen_count = unseen_count + 1 where id = $1", [request.body.user_id])
 
-        response.send(
+        try
         {
-            error_code: 0
-        })
+            await pgPool.query("delete from vaccination\
+                                where user_id = $1\
+                                and vaccine_id = $2 and vaccination_date = $3", [request.body.user_id, request.body.vaccine_id, request.body.vaccine_date])
+            await pgPool.query("update users set unseen_count = unseen_count + 1 where id = $1", [request.body.user_id])
+
+            response.send(
+            {
+                error_code: 0
+            })
+        }
+        catch(error)
+        {
+            response.send(
+            {
+                error_code: -1
+            })
+        }
     }
     else
     {
