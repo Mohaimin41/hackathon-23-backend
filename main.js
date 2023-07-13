@@ -214,7 +214,7 @@ app.post("/vaccination-done", async (request, response) =>
         {
             await pgPool.query("delete from vaccination\
                                 where user_id = $1\
-                                and vaccine_id = $2
+                                and vaccine_id = $2",
                                 [
                                     request.body.user_id,
                                     request.body.vaccine_id
