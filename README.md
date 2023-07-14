@@ -1,9 +1,9 @@
-## Vaccination Website Backend
+<p align="center"> <h2 align="center"> Vaccination System Backend </h2> </p>
 
 This repo contains the codes for the RESTful API Backend server for our submission in the BUET CSE Fest 23 Hackathon. We used **ExpressJS** to serve a simple REST api to the Svelte frontend. There are gateways for the user to signup, login, register for vaccination and get reminders for vaccination dates. The backend database runs on an **Azure Postgresql instance.**
 
 ### CI/CD
-The repo contains **github actions** ensuring continuous integration/ continuos development, with automated testing, building and deploying to **Azure web app service**.
+The repo contains **github actions** ensuring continuous integration/ continuos development, with automated testing, building and deploying to **Azure web app service**. In a linux runner, the code is tested and built, then pushed to deployment.
 
 ### Monitoring and Alerts
 
