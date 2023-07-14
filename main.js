@@ -201,13 +201,16 @@ app.post("/vaccination-done", async (request, response) =>
 
     if(result.rowCount > 0)
     {
+        let date = new Date(Date.now())
+
         await pgPool.query("insert into vaccination_message\
-                            (user_id, vaccine_id, vaccination_date)\
-                            values($1, $2, $3)",
+                            (user_id, vaccine_id, vaccination_date, message_time)\
+                            values($1, $2, $3, $4)",
                             [
                                 request.body.user_id,
                                 request.body.vaccine_id,
-                                request.body.vaccine_date
+                                request.body.vaccine_date,
+                                date.getTime()
                             ])
 
         try
@@ -266,6 +269,30 @@ app.post("/message-unseen", async (request, response) =>
     {
         error_code: 0,
         unseen_count: result.rows[0].unseen_count
+    })
+})
+
+app.post("/get-messages", async (request, response) =>
+{
+    let result = await pgPool.query("select vaccination_date, vaccine_name\
+                                        from vaccination_message\
+                                        join vaccine\
+                                        on vaccine.vaccine_id = vaccination_message.vaccine_id\
+                                        where user_id = $1\
+                                        order by message_time desc",
+                                    [request.body.user_id])
+
+    let list = []
+
+    for(let i = 0; i < result.rowCount; ++i)
+    {
+        list.push({date: result.rows[i].vaccination_date, vaccine_name: result.rows[i].vaccine_name, })
+    }
+
+    response.send(
+    {
+        error_code: 0,
+        list: list
     })
 })
 
