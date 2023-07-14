@@ -296,6 +296,23 @@ app.post("/get-messages", async (request, response) =>
     })
 })
 
+app.post("/get-vaccines", async (request, response) =>
+{
+    let result = await pgPool.query("select * from vaccine")
+    let list = []
+
+    for(let i = 0; i < result.rowCount; ++i)
+    {
+        list.push({id: result.rows[i].vaccine_id, name: result.rows[i].vaccine_name})
+    }
+
+    response.send(
+    {
+        error_code: 0,
+        list: list
+    })
+})
+
 const server = app.listen(process.env.PORT || port, () =>
 {
     console.log("Server listening on port " + port)
